@@ -1,5 +1,7 @@
 package fpinscala.exercises.datastructures
 
+import scala.annotation.tailrec
+
 /** `List` data type, parameterized on a type, `A`. */
 enum List[+A]:
   /** A `List` data constructor representing the empty list. */
@@ -47,15 +49,30 @@ object List: // `List` companion object. Contains functions for creating and wor
   def productViaFoldRight(ns: List[Double]): Double =
     foldRight(ns, 1.0, _ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
-  def tail[A](l: List[A]): List[A] = ???
+  def tail[A](l: List[A]): List[A] = l match
+    case Nil => sys.error("empty list")
+    case Cons(_, tail) => tail
 
-  def setHead[A](l: List[A], h: A): List[A] = ???
+  def setHead[A](l: List[A], h: A): List[A] = l match
+    case Nil => sys.error("empty list")
+    case Cons(_, tail) => Cons(h, tail)
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  @tailrec
+  def drop[A](l: List[A], n: Int): List[A] =
+    if n <= 0 then l
+    else l match
+      case Nil => Nil
+      case Cons(_, tail) => drop(tail, n - 1)
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
+  @tailrec
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match
+    case Cons(head, tail) if f(head) => dropWhile(tail, f)
+    case l => l
 
-  def init[A](l: List[A]): List[A] = ???
+  def init[A](l: List[A]): List[A] = l match
+    case Nil => sys.error("empty list")
+    case Cons(_, Nil) => Nil
+    case Cons(head, tail) => Cons(head, init(tail))
 
   def length[A](l: List[A]): Int = ???
 
